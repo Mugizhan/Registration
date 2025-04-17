@@ -123,7 +123,6 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
         final repo = RegisterRepository();
         final response = await repo.storeData(userData);
-
         emit(state.copyWith(formStatus: FormSuccess("Registration Successful")));
       } else {
         emit(state.copyWith(formStatus: FormFailed("Please correct the errors")));

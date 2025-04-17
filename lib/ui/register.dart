@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../bloc/form_bloc/form_event.dart';
 import '../bloc/form_bloc/form_event.dart';
 import '../bloc/register_bloc/register_bloc.dart';
 import '../bloc/register_bloc/register_event.dart';
@@ -11,24 +13,43 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-  create: (context) => RegisterBloc(),
-  child: Scaffold(
-      body: BlocBuilder<RegisterBloc, RegisterState>(
-        builder: (context, state) {
-          return SlotLayout(config: {
-            Breakpoints.small:SlotLayout.from(
-              key:Key('mobile'),
-              builder:(context)=>RegisterMobileView()
-            ),
-            Breakpoints.mediumAndUp:SlotLayout.from(
-                key:Key('mobile'),
-                builder:(context)=>RegisterLaptopView()
-            )
-          });
-        },
+      create: (context) => RegisterBloc(),
+      child: Scaffold(
+        body: BlocListener<RegisterBloc, RegisterState>(
+          listener: (context, state) {
+            if (state.formStatus is FormSuccess) {
+              final success = state.formStatus as FormSuccess;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(success.message)),
+              );
+              context.go('/home');
+            } else if (state.formStatus is FormFailed) {
+              final failure = state.formStatus as FormFailed;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(failure.message)),
+              );
+              context.go('/home');
+            }
+
+          },
+          child: BlocBuilder<RegisterBloc, RegisterState>(
+            builder: (context, state) {
+              return SlotLayout(config: {
+                Breakpoints.small: SlotLayout.from(
+                  key: Key('mobile'),
+                  builder: (context) => RegisterMobileView(),
+                ),
+                Breakpoints.mediumAndUp: SlotLayout.from(
+                  key: Key('laptop'),
+                  builder: (context) => RegisterLaptopView(),
+                ),
+              });
+            },
+          ),
+        ),
       ),
-    ),
-);
+    );
+
   }
 }
 
@@ -122,7 +143,7 @@ class _RegisterLaptopViewState extends State<RegisterLaptopView> {
               child: Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('Asset/image/img.png'),
+                    image: AssetImage('Asset/image/uae.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
