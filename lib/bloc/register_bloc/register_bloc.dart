@@ -6,7 +6,8 @@ import 'register_event.dart';
 import 'register_state.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
-  RegisterBloc() : super(const RegisterState()) {
+  final RegisterRepository registerRepository;
+  RegisterBloc({required this.registerRepository}) : super(const RegisterState()) {
     on<RegisterEvent>((event, emit) async {
       await mapEventToState(event, emit);
     });
@@ -84,9 +85,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
      formStatus: FormEditing(),
       ));
     } else if (event is RegisterSubmit){
-      emit(state.copyWith(
-        formStatus: FormLoading()
-      ));
+      Future.delayed(Duration(seconds: 5));
       emit(state.copyWith(
         isNameValid: state.name.isNotEmpty,
         isEmailValid: RegExp(r'^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]+').hasMatch(state.email),
@@ -99,6 +98,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         isTermsAccepted: state.termsAccepted == 'true',
         formStatus: FormLoading(),
       ));
+      Future.delayed(Duration(seconds: 5));
       if (state.isValid) {
         final address = Address(
           street: state.street,

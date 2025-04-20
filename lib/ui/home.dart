@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:form1/bloc/home_bloc/home_bloc.dart';
+import 'package:form1/bloc/home_bloc/home_state.dart';
+import 'package:go_router/go_router.dart';
+
+import '../bloc/home_bloc/home_event.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -10,18 +16,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   @override
   Widget build(BuildContext context) {
-    return SlotLayout(config: {
-      Breakpoints.small:SlotLayout.from(
-        key: Key('small'),
-        builder: (context)=>HomeMobileView()
-      ),
-      Breakpoints.mediumAndUp:SlotLayout.from(
-          key: Key('large'),
+    return BlocProvider(
+  create: (context) => HomeBloc(),
+  child: Scaffold(
+    body: SlotLayout(config: {
+        Breakpoints.small:SlotLayout.from(
+          key: Key('small'),
           builder: (context)=>HomeMobileView()
-      )
-    });
+        ),
+        Breakpoints.mediumAndUp:SlotLayout.from(
+            key: Key('medium'),
+            builder: (context)=>HomeLaptopView()
+        )
+      }),
+  ),
+);
   }
 }
 
@@ -36,37 +48,24 @@ class HomeMobileView extends StatefulWidget {
 
 class _HomeMobileViewState extends State<HomeMobileView> {
   @override
-  String? selectedCountry;
 
-  final List<Map<String,String>> country=[
-    {
-      'logo':'Asset/image/flag/usa.png',
-      'name':'USA'
-    },
-    {
-    'logo':'Asset/image/flag/india.png',
-      'name':'India'
-    },
-    {
-    'logo':'Asset/image/flag/uae.png',
-      'name':'UAE'
-    }
-  ];
+  final Map<String, String> countryFlag = {
+    'USA': 'Asset/image/flag/usa.png',
+    'India': 'Asset/image/flag/india.png',
+    'UAE': 'Asset/image/flag/uae.png',
+  };
+
+  final List<String> countries = ['USA', 'India', 'UAE'];
+
+
+
  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple[800],
-        leading: Icon(Icons.short_text,color: Colors.white,size: 40),
-        actions: [
-         Padding(
-             padding: EdgeInsets.symmetric(horizontal: 30),
-             child: Icon(Icons.notifications_none,color: Colors.white,size: 40)
-         ),
-
-        ],
-      ),
       body: SingleChildScrollView(
-        child: Container(
+        child: BlocBuilder<HomeBloc, HomeState>(
+  builder: (context, state) {
+    final selectedCountry = state.selectedCountry;
+    return Container(
           decoration: BoxDecoration(color: Colors.white),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,8 +73,8 @@ class _HomeMobileViewState extends State<HomeMobileView> {
               Container(
                 alignment: Alignment.topLeft,
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.35,
-                padding: EdgeInsets.all(30),
+                height: MediaQuery.of(context).size.width * 0.75,
+                padding: EdgeInsets.all( MediaQuery.of(context).size.width*0.06),
                 decoration: BoxDecoration(
                     color: Colors.deepPurple[800],
                 borderRadius: BorderRadius.only(bottomLeft: Radius.circular(50),bottomRight: Radius.circular(50))
@@ -88,16 +87,17 @@ class _HomeMobileViewState extends State<HomeMobileView> {
                      children: [
                        Text("Covid-19",style: TextStyle(
                          color:Colors.white,
-                         fontSize: 30,
-                         fontWeight: FontWeight.bold
+                         fontSize:  30,
+                           fontWeight: FontWeight.bold
                        ),),
 
 
                        SizedBox(
                          width: 120,
-                         height: 50,
-                         child: DropdownButtonFormField(
-                           value: selectedCountry ?? 'USA', // Default selected value
+                         child: DropdownButtonFormField<String>(
+                           value: countries.contains(selectedCountry)
+                               ? selectedCountry
+                               : countries.first,
                            decoration: InputDecoration(
                              filled: true,
                              fillColor: Colors.white,
@@ -105,28 +105,24 @@ class _HomeMobileViewState extends State<HomeMobileView> {
                                borderSide: BorderSide.none,
                                borderRadius: BorderRadius.circular(30),
                              ),
-                             contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                              prefixIcon: Padding(
-                               padding: const EdgeInsets.only(left: 1, right: 1),
+                               padding: const EdgeInsets.only(left: 5, right: 5),
                                child: Image.asset(
-                                 country.firstWhere(
-                                       (c) => c['name'] == selectedCountry,
-                                   orElse: () => country[0],
-                                 )['logo'] ?? '',
+                                 countryFlag[selectedCountry] ?? '',
                                  width: 30,
                                  height: 30,
                                ),
                              ),
                            ),
                            isExpanded: true,
-                           dropdownColor: Colors.white,
-                           icon: Icon(Icons.arrow_drop_down_sharp,size: 25),
-                           items: country.map((country) {
+                           icon: const Icon(Icons.arrow_drop_down_sharp, size: 25),
+                           items: countries.map((country) {
                              return DropdownMenuItem<String>(
-                               value: country['name'],
+                               value: country,
                                child: Text(
-                                 country['name'] ?? '',
-                                 style: TextStyle(
+                                 country,
+                                 style: const TextStyle(
                                    color: Colors.black87,
                                    fontSize: 15,
                                    fontWeight: FontWeight.w400,
@@ -135,12 +131,12 @@ class _HomeMobileViewState extends State<HomeMobileView> {
                              );
                            }).toList(),
                            onChanged: (value) {
-                             setState(() {
-                               selectedCountry = value;
-                             });
+                             if (value != null) {
+                               context.read<HomeBloc>().add(CountryChanged(country: value));
+                             }
                            },
                          ),
-                       ),
+                       )
 
 
 
@@ -159,7 +155,7 @@ class _HomeMobileViewState extends State<HomeMobileView> {
 
                     ),),
 
-                    SizedBox(height: 20),
+                    SizedBox(height: MediaQuery.of(context).size.width*0.05),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -198,7 +194,7 @@ class _HomeMobileViewState extends State<HomeMobileView> {
                         ),
                       )
                     ],
-                  )
+                  ),
                   ],
                 ),
               ),
@@ -316,67 +312,9 @@ class _HomeMobileViewState extends State<HomeMobileView> {
               ),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.white,      // Color when selected
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: false,
-        iconSize: 30,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            activeIcon: Container(
-              decoration: BoxDecoration(
-                color: Colors.indigoAccent,
-                borderRadius: BorderRadius.circular(20)
-              ),
-              height: 42,
-              width: 70,
-              child: Icon(Icons.home),
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            activeIcon: Container(
-              decoration: BoxDecoration(
-                  color: Colors.indigoAccent,
-                  borderRadius: BorderRadius.circular(20)
-              ),
-              height: 42,
-              width: 70,
-              child: Icon(Icons.bar_chart),
-            ),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper),
-            activeIcon: Container(
-              decoration: BoxDecoration(
-                  color: Colors.indigoAccent,
-                  borderRadius: BorderRadius.circular(20)
-              ),
-              height: 42,
-              width: 70,
-              child: Icon(Icons.newspaper),
-            ),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            activeIcon: Container(
-              decoration: BoxDecoration(
-                  color: Colors.indigoAccent,
-                  borderRadius: BorderRadius.circular(20)
-              ),
-              height: 42,
-              width: 70,
-              child: Icon(Icons.info),
-            ),
-            label: 'Profile',
-          ),
-        ],
+        );
+  },
+),
       ),
 
     );

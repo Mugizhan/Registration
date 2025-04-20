@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:form1/data/repository/register_repository.dart';
 import 'package:form1/router/router_config.dart';
 
 void main() {
@@ -17,9 +19,14 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: AppRouter.router,
-    );
+    return MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider(create: (context)=>RegisterRepository()),
+          RepositoryProvider(create: (context)=>{})
+        ],
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          routerConfig: AppRouter.router,
+        ));
   }
 }

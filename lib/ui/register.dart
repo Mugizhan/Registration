@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:form1/data/repository/register_repository.dart';
+import 'package:form1/ui/Loading.dart';
 import 'package:go_router/go_router.dart';
 import '../bloc/form_bloc/form_event.dart';
 import '../bloc/form_bloc/form_event.dart';
@@ -13,7 +15,8 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RegisterBloc(),
+      create: (context) => RegisterBloc(
+          registerRepository:context.read<RegisterRepository>()),
       child: Scaffold(
         body: BlocListener<RegisterBloc, RegisterState>(
           listener: (context, state) {
@@ -22,18 +25,21 @@ class RegisterScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(success.message)),
               );
-              context.go('/home');
+              context.go('/main');
             } else if (state.formStatus is FormFailed) {
               final failure = state.formStatus as FormFailed;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(failure.message)),
               );
-              context.go('/home');
+              context.go('/main');
             }
 
           },
           child: BlocBuilder<RegisterBloc, RegisterState>(
             builder: (context, state) {
+              if(state.formStatus==FormLoading()){
+                return LoadingScreen();
+              }
               return SlotLayout(config: {
                 Breakpoints.small: SlotLayout.from(
                   key: Key('mobile'),
