@@ -11,7 +11,7 @@ class StatisticsModel{
   final int death;
   @JsonKey(name:'discharged')
   final int recovered;
-  @JsonKey(name:'total')
+  @JsonKey(name:'totalConfirmed')
   final int active;
   @JsonKey(name:'confirmedCasesForeign')
   final int serious;

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:form1/bloc/form_bloc/data_fetch.dart';
 import 'package:form1/bloc/home_bloc/home_bloc.dart';
 import 'package:form1/bloc/home_bloc/home_state.dart';
+import 'package:form1/data/model/StatisticsModel.dart';
 import 'package:form1/data/repository/statistics_repository.dart';
 import '../bloc/statistics_bloc/statistics_bloc.dart';
 import '../bloc/statistics_bloc/statistics_event.dart';
+import '../bloc/statistics_bloc/statistics_state.dart';
+
 
 class StatisticScreen extends StatelessWidget {
   const StatisticScreen({super.key});
@@ -15,16 +19,34 @@ class StatisticScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => StatisticsBloc(
         statisticsRepo: context.read<StatisticRepository>(),
-      )..add(StaticPageLoad()), // Corrected to match event class name
-      child: SlotLayout(config: {
-        Breakpoints.small: SlotLayout.from(
-          key: const Key('mobile'),
-          builder: (context) => const StatisticMobileScreen(),
+      )..add(StaticPageLoad()),
+      child: BlocListener<StatisticsBloc, StatisticsState>(
+        listener: (context, state) {
+          // If the data fetch failed, show a SnackBar or an alert dialog
+          if (state.formStatus is DataFetchedFailed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to load statistics')),
+            );
+          }
+        },
+        child: BlocBuilder<StatisticsBloc, StatisticsState>(
+          builder: (context, state) {
+            // Proceed to display the statistics data if available
+            return SlotLayout(
+              config: {
+                Breakpoints.small: SlotLayout.from(
+                  key: const Key('mobile'),
+                  builder: (context) => StatisticMobileScreen(),
+                ),
+              },
+            );
+          },
         ),
-      }),
+      ),
     );
   }
 }
+
 
 
 class StatisticMobileScreen extends StatelessWidget {
@@ -152,16 +174,20 @@ class MyCountry extends StatefulWidget {
 }
 
 class _MyCountryState extends State<MyCountry> {
-  final stats = [
-    {"label": "Affected", "value": "336,851"},
-    {"label": "Death", "value": "9,620", "color": Colors.red},
-    {"label": "Recovered", "value": "17,977", "color": Colors.green},
-    {"label": "Active", "value": "301,251", "color": Colors.lightBlue},
-    {"label": "Serious", "value": "8,702", "color": Colors.purple},
-  ];
-
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<StatisticsBloc, StatisticsState>(
+  builder: (context, state) {
+    final dataFetch = state.fetchedData;
+
+    if (state.formStatus is DataFetchedLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (dataFetch == null) {
+      return Center(child: Text('No statistics data available'));
+    }
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 16.0),
@@ -208,12 +234,12 @@ class _MyCountryState extends State<MyCountry> {
                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
-                                         Text('${stats[0]['label']}',style: TextStyle(
+                                         Text('Affected',style: TextStyle(
                                              color: Colors.white,
                                              fontSize: 17,
                                              fontWeight: FontWeight.w500
                                          ),),
-                                         Text('${stats[0]['value']}',style: TextStyle(
+                                         Text('${dataFetch.affected}',style: TextStyle(
                                              color: Colors.white,
                                              fontSize: 25,
                                              fontWeight: FontWeight.w600
@@ -234,12 +260,12 @@ class _MyCountryState extends State<MyCountry> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('${stats[1]['label']}',style: TextStyle(
+                                              Text('Death',style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 17,
                                                   fontWeight: FontWeight.w500
                                               ),),
-                                              Text('${stats[1]['value']}',style: TextStyle(
+                                              Text('${dataFetch.death}',style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 25,
                                                   fontWeight: FontWeight.w600
@@ -266,14 +292,14 @@ class _MyCountryState extends State<MyCountry> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('${stats[2]['label']}',style: TextStyle(
+                                              Text('Recovered',style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 17,
+                                                  fontSize: 15,
                                                   fontWeight: FontWeight.w500
                                               ),),
-                                              Text('${stats[2]['value']}',style: TextStyle(
+                                              Text('${dataFetch.recovered}',style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 25,
+                                                  fontSize: 19,
                                                   fontWeight: FontWeight.w600
                                               ),),
                                             ],
@@ -293,14 +319,14 @@ class _MyCountryState extends State<MyCountry> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('${stats[3]['label']}',style: TextStyle(
+                                              Text('Active',style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 17,
+                                                  fontSize: 15,
                                                   fontWeight: FontWeight.w500
                                               ),),
-                                              Text('${stats[3]['value']}',style: TextStyle(
+                                              Text('${dataFetch.active}',style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 22,
+                                                  fontSize: 19,
                                                   fontWeight: FontWeight.w600
                                               ),),
                                             ],
@@ -319,14 +345,14 @@ class _MyCountryState extends State<MyCountry> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('${stats[4]['label']}',style: TextStyle(
+                                              Text('Serious',style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 17,
+                                                  fontSize: 15,
                                                   fontWeight: FontWeight.w500
                                               ),),
-                                              Text('${stats[4]['value']}',style: TextStyle(
+                                              Text('${dataFetch.serious}',style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 25,
+                                                  fontSize: 19,
                                                   fontWeight: FontWeight.w600
                                               ),),
                                             ],
@@ -347,5 +373,7 @@ class _MyCountryState extends State<MyCountry> {
         ),
       ),
     );
+  },
+);
   }
 }
