@@ -51,118 +51,171 @@ class StatisticScreen extends StatelessWidget {
 
 class StatisticMobileScreen extends StatelessWidget {
   const StatisticMobileScreen({super.key});
+  void _openBottomDrawer(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) =>Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.4,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(40),
+          topRight: Radius.circular(40),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          const Text(
+            'Daily New Cases',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            height:200,
+            decoration: BoxDecoration(
+                image:DecorationImage(image:AssetImage('Asset/image/barchart.png',),fit:BoxFit.fill)
+            ),
+          )
+        ],
+      ),
+    ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
   builder: (context, state) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.deepPurple[800],
-      ),
-      child: Stack(
-        children: [
-          SafeArea(
-            child: DefaultTabController(
-              length: 2,
+    return Scaffold(
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.deepPurple[800],
+        ),
+        child: Stack(
+          children: [
+            SafeArea(
+              child: DefaultTabController(
+                length: 2,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Statistics',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6A52A2), // Background of pill tab bar
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: TabBar(
+                          indicator: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: const BorderRadius.all(Radius.circular(30)),
+                          ),
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          labelColor: Colors.black,
+                          unselectedLabelColor: const Color(0xFFD6BBF7),
+                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                          dividerColor: Colors.transparent,
+                          tabs: const [
+                            Tab(text: "My Country"),
+                            Tab(text: "Global"),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Removed Expanded to prevent unbounded height error
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.33, // Adjusted height for TabBarView
+                        child: const TabBarView(
+                          children: [
+                            MyCountry(),
+                            Center(child: Text("Global")),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom:MediaQuery.of(context).size.height*0.0001 ,
+              left: 0,
+              right: 0,
               child: Container(
-                padding: EdgeInsets.all(20),
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.3,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ), // Optional: rounded corners for the container
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Statistics',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
                     const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF6A52A2), // Background of pill tab bar
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: TabBar(
-                        indicator: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(30)),
-                        ),
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: Colors.black,
-                        unselectedLabelColor: const Color(0xFFD6BBF7),
-                        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                        dividerColor: Colors.transparent,
-                        tabs: const [
-                          Tab(text: "My Country"),
-                          Tab(text: "Global"),
-                        ],
+                    const Text(
+                      'Daily New Cases',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    // Removed Expanded to prevent unbounded height error
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.33, // Adjusted height for TabBarView
-                      child: const TabBarView(
-                        children: [
-                          MyCountry(),
-                          Center(child: Text("Global")),
-                        ],
-                      ),
+                  Container(
+                    width: double.infinity,
+                    height:200,
+                    decoration: BoxDecoration(
+                      image:DecorationImage(image:AssetImage('Asset/image/barchart.png',),fit:BoxFit.fill)
                     ),
+                  )
                   ],
                 ),
               ),
             ),
-          ),
-          Positioned(
-            bottom:MediaQuery.of(context).size.height*0.0001 ,
-            left: 0,
-            right: 0,
-            child: Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.3,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ), // Optional: rounded corners for the container
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Daily New Cases',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  height:200,
-                  decoration: BoxDecoration(
-                    image:DecorationImage(image:AssetImage('Asset/image/barchart.png',),fit:BoxFit.fill)
-                  ),
-                )
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: StadiumBorder(),
+
+        onPressed: () => _openBottomDrawer(context),
+        child: Icon(Icons.bar_chart_rounded,),
       ),
     );
   },
+
 );
+
   }
+
 }
 
 
@@ -189,12 +242,11 @@ class _MyCountryState extends State<MyCountry> {
     }
 
     return SingleChildScrollView(
-      child: Padding(
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 16.0),
         child: DefaultTabController(
           length: 3,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TabBar(
                 indicatorColor: Colors.white,
@@ -213,8 +265,8 @@ class _MyCountryState extends State<MyCountry> {
                   Tab(text: "Yesterday"),
                 ],
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.4,
+              Container(
+                height: MediaQuery.of(context).size.height * 0.3,
                 child: TabBarView(
                   children: [
                     // TOTAL TAB
@@ -224,7 +276,7 @@ class _MyCountryState extends State<MyCountry> {
                           children: [
                             Expanded(
                                 child: Container(
-                                  height: 120,
+                                  height: 130,
                                   child: Card(
                                    elevation: 10,
                                    color: Colors.orange,
