@@ -23,7 +23,9 @@ class MainScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => HomeBloc(),
       child: BlocBuilder<HomeBloc, HomeState>(
+
         builder: (context, state) {
+         final  int index=state.currentIndex;
           return Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.deepPurple[800],
@@ -40,8 +42,9 @@ class MainScreen extends StatelessWidget {
             ),
             body: screens[state.currentIndex],
             bottomNavigationBar: BottomNavigationBar(
-              currentIndex: state.currentIndex,
+              currentIndex:index,
               selectedItemColor: Colors.white,
+              backgroundColor: Colors.white,
               unselectedItemColor: Colors.grey,
               showSelectedLabels: false,
               iconSize: 30,

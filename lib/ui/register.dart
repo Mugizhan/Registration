@@ -149,7 +149,7 @@ class _RegisterLaptopViewState extends State<RegisterLaptopView> {
               child: Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('Asset/image/uae.png'),
+                    image: AssetImage('Asset/image/img.png'),
                     fit: BoxFit.cover,
                   ),
                 ),

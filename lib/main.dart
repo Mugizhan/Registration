@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form1/data/repository/register_repository.dart';
+import 'package:form1/data/repository/statistics_repository.dart';
 import 'package:form1/router/router_config.dart';
 
 void main() {
@@ -22,7 +23,7 @@ class _MyAppState extends State<MyApp> {
     return MultiRepositoryProvider(
         providers: [
           RepositoryProvider(create: (context)=>RegisterRepository()),
-          RepositoryProvider(create: (context)=>{})
+          RepositoryProvider(create: (context)=>StatisticRepository())
         ],
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
