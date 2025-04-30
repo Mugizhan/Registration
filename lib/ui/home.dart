@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,55 +90,56 @@ class _HomeMobileViewState extends State<HomeMobileView> {
                          color:Colors.white,
                          fontSize:  30,
                            fontWeight: FontWeight.bold
-                       ),),
-
-
-                       SizedBox(
-                         width: 120,
-                         child: DropdownButtonFormField<String>(
-                           value: countries.contains(selectedCountry)
-                               ? selectedCountry
-                               : countries.first,
-                           decoration: InputDecoration(
-                             filled: true,
-                             fillColor: Colors.white,
-                             border: OutlineInputBorder(
-                               borderSide: BorderSide.none,
-                               borderRadius: BorderRadius.circular(30),
-                             ),
-                             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                             prefixIcon: Padding(
-                               padding: const EdgeInsets.only(left: 5, right: 5),
-                               child: Image.asset(
-                                 countryFlag[selectedCountry] ?? '',
-                                 width: 30,
-                                 height: 30,
-                               ),
-                             ),
-                           ),
-                           isExpanded: true,
-                           icon: const Icon(Icons.arrow_drop_down_sharp, size: 25),
-                           items: countries.map((country) {
-                             return DropdownMenuItem<String>(
-                               value: country,
-                               child: Text(
-                                 country,
-                                 style: const TextStyle(
-                                   color: Colors.black87,
-                                   fontSize: 15,
-                                   fontWeight: FontWeight.w400,
-                                 ),
-                               ),
-                             );
-                           }).toList(),
-                           onChanged: (value) {
-                             if (value != null) {
-                               context.read<HomeBloc>().add(CountryChanged(country: value));
-                             }
-                           },
-                         ),
-                       )
-
+                       ),
+                       ),
+                SizedBox(
+                  width: 120,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      isExpanded: true,
+                      buttonStyleData: ButtonStyleData(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      value: countries.contains(selectedCountry)
+                          ? selectedCountry
+                          : countries.first,
+                      items: countries.map((country) {
+                        return DropdownMenuItem<String>(
+                          value: country,
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                countryFlag[country] ?? '',
+                                width: 35,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  country,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          context.read<HomeBloc>().add(CountryChanged(country: value));
+                        }
+                      },
+                    ),
+                  ),
+                )
 
 
                      ],

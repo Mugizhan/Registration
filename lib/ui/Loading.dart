@@ -11,6 +11,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
        child: Container(
          child: Image.asset('Asset/image/loading.gif'),

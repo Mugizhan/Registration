@@ -9,6 +9,7 @@ import 'package:form1/data/repository/statistics_repository.dart';
 import '../bloc/statistics_bloc/statistics_bloc.dart';
 import '../bloc/statistics_bloc/statistics_event.dart';
 import '../bloc/statistics_bloc/statistics_state.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 
 class StatisticScreen extends StatelessWidget {
@@ -38,9 +39,92 @@ class StatisticScreen extends StatelessWidget {
                   key: const Key('mobile'),
                   builder: (context) => StatisticMobileScreen(),
                 ),
+                Breakpoints.mediumAndUp: SlotLayout.from(
+                  key: const Key('mobile'),
+                  builder: (context) => StatistiLapScreen(),
+                ),
               },
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+
+class StatistiLapScreen extends StatefulWidget {
+  const StatistiLapScreen({super.key});
+
+  @override
+  State<StatistiLapScreen> createState() => _StatistiLapScreenState();
+}
+
+class _StatistiLapScreenState extends State<StatistiLapScreen> {
+  final List<String> items = [
+    'Apple',
+    'Banana',
+    'Mango',
+    'Orange',
+    'Pineapple',
+  ];
+  String? selectedValue;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('DropdownButton2 Example')),
+      body: Center(
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton2<String>(
+            isExpanded: true,
+            hint: const Text(
+              'Select Item',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+            ),
+            items: items.map((item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(
+                item,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            )).toList(),
+            value: selectedValue,
+            onChanged: (value) {
+              setState(() {
+                selectedValue = value;
+              });
+            },
+            buttonStyleData: ButtonStyleData(
+              height: 60,
+              width: 250,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: Colors.white,
+              ),
+              elevation: 1,
+            ),
+
+            dropdownStyleData: DropdownStyleData(
+              maxHeight: 200,
+              width: 250,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: Colors.white,
+              ),
+              elevation: 8,
+              padding: null,
+            ),
+            menuItemStyleData: const MenuItemStyleData(
+              height: 50,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+            ),
+          ),
         ),
       ),
     );
@@ -429,3 +513,5 @@ class _MyCountryState extends State<MyCountry> {
 );
   }
 }
+
+

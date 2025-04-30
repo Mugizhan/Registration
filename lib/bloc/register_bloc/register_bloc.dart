@@ -23,16 +23,21 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     } else if (event is EmailChanged) {
       emit(state.copyWith(
         email: event.email,
+        isEmailValid: RegExp(r'^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]+').hasMatch(state.email),
         formStatus: FormEditing(),
       ));
-    } else if (event is PhoneChanged) {
+    }
+    else if (event is PhoneChanged) {
       emit(state.copyWith(
         phoneNumber: event.phoneNumber,
+        isPhoneValid: event.phoneNumber.length == 10 && RegExp(r'^\d{10}$').hasMatch(event.phoneNumber),
         formStatus: FormEditing(),
       ));
-    } else if (event is DobChanged) {
+    }
+    else if (event is DobChanged) {
       emit(state.copyWith(
         dob: event.dob,
+        isDobValid: event.dob.isNotEmpty,
         formStatus: FormEditing(),
       ));
     }
@@ -61,27 +66,32 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     else if (event is GenderChanged) {
       emit(state.copyWith(
         gender: event.gender,
+        isGenderValid: event.gender.isNotEmpty,
         formStatus: FormEditing(),
       ));
     } else if (event is AboutChanged) {
       emit(state.copyWith(
         about: event.about,
+        isAboutValid: event.about.isNotEmpty,
         formStatus: FormEditing(),
       ));
     } else if (event is PasswordChanged) {
       emit(state.copyWith(
         password: event.password,
-        isConfirmPasswordValid: event.password == state.confirmPassword,
+        isPasswordValid: event.password.length >= 6,
+        isConfirmPasswordValid: state.password == state.confirmPassword,
         formStatus: FormEditing(),
       ));
     } else if (event is ConfirmPasswordChanged) {
       emit(state.copyWith(
         confirmPassword: event.confirmPassword,
+        isConfirmPasswordValid: state.password == event.confirmPassword,
        formStatus: FormEditing(),
       ));
     } else if (event is ConditionChanged) {
       emit(state.copyWith(
         termsAccepted: event.accepted,
+        isTermsAccepted: event.accepted == 'true',
      formStatus: FormEditing(),
       ));
     } else if (event is RegisterSubmit){
@@ -91,6 +101,9 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         isEmailValid: RegExp(r'^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]+').hasMatch(state.email),
         isPhoneValid: state.phoneNumber.length == 10 && RegExp(r'^\d{10}$').hasMatch(state.phoneNumber),
         isDobValid: state.dob.isNotEmpty,
+        isStreetValid: state.street.isNotEmpty,
+        isStateValid: state.state.isNotEmpty,
+        isCountryValid: state.country.isNotEmpty,
         isGenderValid: state.gender.isNotEmpty,
         isAboutValid: state.about.isNotEmpty,
         isPasswordValid: state.password.length >= 6,

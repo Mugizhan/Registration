@@ -1,14 +1,15 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form1/data/repository/register_repository.dart';
 import 'package:form1/ui/Loading.dart';
 import 'package:go_router/go_router.dart';
 import '../bloc/form_bloc/form_event.dart';
-import '../bloc/form_bloc/form_event.dart';
 import '../bloc/register_bloc/register_bloc.dart';
 import '../bloc/register_bloc/register_event.dart';
 import '../bloc/register_bloc/register_state.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
@@ -31,9 +32,7 @@ class RegisterScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(failure.message)),
               );
-              context.go('/main');
             }
-
           },
           child: BlocBuilder<RegisterBloc, RegisterState>(
             builder: (context, state) {
@@ -184,11 +183,11 @@ class RegistrationForm extends StatefulWidget {
 }
 
 class _RegistrationFormState extends State<RegistrationForm> {
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     final state = context.watch<RegisterBloc>().state;
-    bool _isPasswordVisible = false;
-    bool _isConfirmPasswordVisible = false;
     return SingleChildScrollView(
       child: Form(
         child: Column(
@@ -292,70 +291,154 @@ class _RegistrationFormState extends State<RegistrationForm> {
 
             SizedBox(height: 10),
 
-            DropdownButtonFormField(
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.home_work_rounded),
-                labelText: 'Street',
-                errorText: state.isStreetValid ? null : 'All address fields are required',
-                filled: true,
-                fillColor: Colors.blue[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              value: state.street.isNotEmpty ? state.street : null,
-              items: ['Hopes College', 'Singanalore', 'Peelamadu']
-                  .map((street) => DropdownMenuItem(value: street, child: Text(street)))
-                  .toList(),
-              onChanged: (value) {
-                context.read<RegisterBloc>().add(
-                  StreetChange(
-                    street: value!
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DropdownButtonHideUnderline(
+                  child: DropdownButton2(
+                    isExpanded: true,
+                    buttonStyleData: ButtonStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[100],
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 12,
+                    ),
+                    hint: Text(
+                      'Select Street',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    value: state.street.isNotEmpty ? state.street : null,
+                    items: ['Hopes College', 'Singanalore', 'Peelamadu']
+                        .map((street) =>
+                        DropdownMenuItem(value: street, child: Text(street)))
+                        .toList(),
+                    onChanged: (value) {
+                      context.read<RegisterBloc>().add(
+                        StreetChange(street: value!),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+                if (!state.isStreetValid)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, top: 4.0),
+                    child: Text(
+                      'Street is required',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+              ],
             ),
+
             SizedBox(height: 10),
-            DropdownButtonFormField(
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.location_city_rounded),
-                labelText: 'State',
-                errorText: state.isStateValid ? null : 'All address fields are required',
-                filled: true,
-                fillColor: Colors.blue[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+
+// State Dropdown with Validation
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DropdownButtonHideUnderline(
+                  child: DropdownButton2(
+                    isExpanded: true,
+                    value: state.state.isNotEmpty ? state.state : null,
+                    hint: Text(
+                      'Select State',
+                      style: TextStyle(fontSize: 18, color: Colors.black87),
+                    ),
+                    buttonStyleData: ButtonStyleData(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.blue[100],
+                      ),
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      maxHeight: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.white,
+                      ),
+                      elevation: 8,
+                    ),
+                    items: ['Tamil Nadu', 'Kerala', 'Karnataka']
+                        .map((state) => DropdownMenuItem(
+                      value: state,
+                      child: Text(state),
+                    ))
+                        .toList(),
+                    onChanged: (value) => context.read<RegisterBloc>().add(
+                      StateChange(state: value!),
+                    ),
+                  ),
                 ),
-              ),
-              items: ['Tamil Nadu','Kerala','Karnataka'].map((state)=>DropdownMenuItem(value:state,child: Text(state))).toList(),
-              onChanged: (value) => context.read<RegisterBloc>().add(
-                StateChange(
-                  state: value!,
-                ),
-              ),
+                if (!state.isStateValid)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, top: 4.0),
+                    child: Text(
+                      'State is required',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+              ],
             ),
+
             SizedBox(height: 10),
-            DropdownButtonFormField(
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.share_location_outlined),
-                labelText: 'Country',
-                errorText: state.isCountryValid ? null : 'All address fields are required',
-                filled: true,
-                fillColor: Colors.blue[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+
+// Country Dropdown with Validation
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DropdownButtonHideUnderline(
+                  child: DropdownButton2(
+                    isExpanded: true,
+                    value: state.country.isNotEmpty ? state.country : null,
+                    hint: Text(
+                      'Country',
+                      style: TextStyle(fontSize: 18, color: Colors.black87),
+                    ),
+                    buttonStyleData: ButtonStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[100],
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    items: ['India', 'Saudi Arabia', 'USA']
+                        .map((country) => DropdownMenuItem(
+                      value: country,
+                      child: Text(country),
+                    ))
+                        .toList(),
+                    onChanged: (value) => context.read<RegisterBloc>().add(
+                      CountryChanged(country: value!),
+                    ),
+                  ),
                 ),
-              ),
-              items: ['India','Saudi Arabia','USA'].map((country)=>DropdownMenuItem(value:country,child: Text(country))).toList(),
-              onChanged: (value) => context.read<RegisterBloc>().add(
-                CountryChanged(
-                  country: value!,
-                ),
-              ),
+                if (!state.isCountryValid)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, top: 4.0),
+                    child: Text(
+                      'Country is required',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+              ],
             ),
+
             SizedBox(height: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -432,10 +515,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              maxLines: 3,
+              maxLines: null,
+              minLines: 3,
               onChanged: (value) => context.read<RegisterBloc>().add(AboutChanged(about: value)),
             ),
             SizedBox(height: 10),
+            // Password Field
             TextFormField(
               decoration: InputDecoration(
                 suffixIcon: IconButton(
@@ -450,7 +535,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   },
                 ),
                 prefixIcon: Icon(Icons.lock),
-
                 labelText: 'Password',
                 errorText: state.isPasswordValid ? null : 'Password must be at least 6 characters',
                 filled: true,
@@ -460,21 +544,24 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   borderSide: BorderSide.none,
                 ),
               ),
-
-        obscureText: !_isPasswordVisible,
-              onChanged: (value) => context.read<RegisterBloc>().add(PasswordChanged(password: value)),
+              obscureText: !_isPasswordVisible,
+              onChanged: (value) =>
+                  context.read<RegisterBloc>().add(PasswordChanged(password: value)),
             ),
+
             SizedBox(height: 10),
+
+// Confirm Password Field
             TextFormField(
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
                     color: Colors.grey,
                   ),
                   onPressed: () {
                     setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
+                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                     });
                   },
                 ),
@@ -488,9 +575,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              obscureText: !_isPasswordVisible,
-              onChanged: (value) => context.read<RegisterBloc>().add(ConfirmPasswordChanged(confirmPassword: value)),
+              obscureText: !_isConfirmPasswordVisible,
+              onChanged: (value) => context
+                  .read<RegisterBloc>()
+                  .add(ConfirmPasswordChanged(confirmPassword: value)),
             ),
+
             SizedBox(height: 10),
             Row(
               children: [
